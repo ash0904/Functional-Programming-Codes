@@ -101,8 +101,8 @@
 ;;q8
 (define is-subseq (lambda(ls1 ls2)
                   (cond
-                   [(null? ls1) (display "#true")]
-                   [(null? ls2) (display "#false")]
+                   [(null? ls1) #true]
+                   [(null? ls2) #false]
                    [(eq? (car ls1) (car ls2)) (is-subseq (cdr ls1) (cdr ls2))]
                    (else (is-subseq ls1 (cdr ls2)))
                    )))
