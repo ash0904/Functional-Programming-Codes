@@ -36,8 +36,8 @@
 
 (define product (lambda(ls1 ls2)
                 (cond
-                 [(null? ls1) `()]
-                 [(null? ls2) `()]
+                 [(null? ls1) '()]
+                 [(null? ls2) '()]
                  (else (append ( prod (car ls1) ls2) (product (cdr ls1) ls2) ))
                  )))
 
@@ -80,8 +80,8 @@
 ;;q6
 (define findpath (lambda(val root)
                  (cond
-                  [(chk-tree? root) `()]
-                  [(eq? val (node-val root)) `()]
+                  [(chk-tree? root) '()]
+                  [(eq? val (node-val root)) '()]
                   [(< val (node-val root)) (cons 'left (findpath val (left-subtree root)))]
                   (else (cons 'right (findpath val (right-subtree root))))
                   )))
