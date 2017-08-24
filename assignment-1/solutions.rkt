@@ -89,7 +89,7 @@
 ;;q7
 (define ncurry (lambda(f n args)
                 (cond
-                  [(zero? n) (apply f args)]
+                  [(zero? n) (apply f (reverse args))]
                 (else
                  (lambda (x)
                    (ncurry f (- n 1) (cons x args))))
