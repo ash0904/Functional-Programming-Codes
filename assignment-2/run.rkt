@@ -1,10 +1,7 @@
 #lang racket
 
-(provide (all-defined-out))
 (require eopl)
-(require racket/trace)
-(require rackunit)
-(require rackunit/text-ui)
+(provide (all-defined-out))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-datatype Ast Ast?
@@ -17,12 +14,12 @@
 ;; table can be enhanced by adding signature of arguments
 
 (define (^ . args)
-  (define power(lambda(ls)
+  (define power(lambda(base ls)
                  (cond
-                   [(null? ls) 1]
-                   (else (expt (car ls) (power (cdr ls))))
-                 )))
-   (power args))
+                   [(null? ls) base]
+                   (else (power (expt base (car ls))  (cdr ls)))))
+                 )
+   (power (car args) (cdr args)))
 
 (define opTable (list (list '+ + 'n 'plus)
                       (list '- - 'n 'minus)
