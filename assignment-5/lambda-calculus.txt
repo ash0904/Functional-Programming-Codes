@@ -1,0 +1,12 @@
+Answers for lambda calculas section:
+
+1. (lambda(y) (y (lambda(z) u)))
+2. ((lambda(z) u)(lambda(z) u))
+3. a
+4. y
+5. (z (lambda(k) k))
+6. x
+7. Omega
+8. 26
+9. ((lambda (x) y) Omega)
+10. y
