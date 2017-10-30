@@ -2,15 +2,18 @@
 #lang racket
 (provide (all-defined-out))
 (require eopl)
-(require racket/trace)
-(require rackunit)
-(require rackunit/text-ui)
 (require "ast.rkt" "op.rkt" "env.rkt" "parser.rkt" "store.rkt")
 
 ;; apply-closure:= [functionHandle? (list-of Ast?) Env?] => expressible?
 
 (define apply-closure (lambda (c rands envOuter)
 (cases functionHandle c
+   [rec-closure-v (formals body v)
+             (let ((args  (map (lambda (x)(expressible->denotable (eval-ast x envOuter))) rands)))
+                    
+              ;(begin (display (list 'args= args 'rec-env= (extended-env (mk-tuples formals args) (vector-ref v 0))))
+               (eval-ast body  (extended-env (mk-tuples formals args) (vector-ref v 0))))]
+  
    [rec-closure (formals body env r)
 		(let ((args  (map (lambda (x)(expressible->denotable
 					      (eval-ast x envOuter))) rands))
@@ -75,28 +78,33 @@
               ;evaluate the body in the extended environment
               (eval-ast body (extended-env tpls env)))]
 
-       [assume-v (binds body)   
-         (letrec (
-                  ;; all evaluated tuples
-                  [tplsAll (map  (lambda(u)  (mk-tuple 
-                                                  (first u) 
-                                                    (expressible->denotable 
-                                                       (eval-ast (second u) env))))
-                          binds)]
+       [assume-v (binds body)
+          (letrec (
+                   ;; all evaluated tuples
+                   [tplsAll (map  (lambda(u)  (mk-tuple
+                                                   (first u)
+                                                    (expressible->denotable
+                                                        (eval-ast (second u) env))))
+                           binds)]
 
-                  ;; all tuples which have closures build recursive environment
-                  [rec-tuples (filter (lambda(u) (functionHandle? 
+                   ;; all tuples with closures as values build recursive environment
+                   [closure-tuples (filter (lambda(u) (functionHandle?
                                                     (denotable->expressible (second u))))
-                                tplsAll)]
+                                 tplsAll)]
 
 
-                  ;; make all tuples with closures recursive
-                  [recTplsAll   (map  (lambda(u)
-                                       (mk-rec-tuple (first u) (second u) rec-tuples))
-                                                     
-                                   tplsAll)])
-                         ;evaluate the body in the extended environment
-                         (eval-ast body (extended-env recTplsAll env)))] 
+                    ;; make all tuples with closures vector-closures using vector 
+                  [v-tuples (map  (lambda(u)
+                                              (mk-vec-tuple (first u) (second u)))
+                                          tplsAll)]
+                    ;; fix the vector to point to vector recursive environment
+                  [vtplsAll (map  (lambda(u)
+                                              (vec-tuple! (first u) (second u) v-tuples))
+                                          v-tuples)]
+                  
+                   )
+                 ;evaluate the body in the extended environment
+                (eval-ast body (extended-env vtplsAll env)))] 
 
 
        [assume* (binds body)   
@@ -143,8 +151,30 @@
                                                      
                                    tplsAll)])
                          ;evaluate the body in the extended environment
-                         (eval-ast body (extended-env recTplsAll env)))] 
+                         (eval-ast body (extended-env recTplsAll env)))]
+ 
+       [trace-assume (binds body)   
+         (letrec (
+                  ;; all evaluated tuples
+                  [tplsAll (map  (lambda(u)  (mk-tuple 
+                                                  (first u) 
+                                                    (expressible->denotable 
+                                                       (eval-ast (second u) env))))
+                          binds)]
 
+                  ;; all tuples which have closures build recursive environment
+                  [rec-tuples (filter (lambda(u) (functionHandle? 
+                                                    (denotable->expressible (second u))))
+                                tplsAll)]
+
+
+                  ;; make all tuples with closures recursive
+                  [recTplsAll   (map  (lambda(u)
+                                       (mk-rec-tuple (first u) (second u) rec-tuples))
+                                                     
+                                   tplsAll)])
+                         ;evaluate the body in the extended environment
+                         (eval-ast body (extended-env recTplsAll env)))]
      
       [setRef (var val)(*setRef (lookupEnv 
                                    (cases Ast var 

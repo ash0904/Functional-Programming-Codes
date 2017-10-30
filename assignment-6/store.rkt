@@ -2,9 +2,6 @@
 #lang racket
 (provide (all-defined-out))
 (require eopl)
-(require racket/trace)
-(require rackunit)
-(require rackunit/text-ui)
 
 (define store '())
 
@@ -44,21 +41,3 @@
                                                    (- n 1))))))))
 (set! store (setRef-inner store l)))))
 
-;;test cases
-(set! store '())
-(check-equal? 0 (*newRef 10))
-(check-equal? 1 (*newRef 20))
-(check-equal? 2 (*newRef 30))
-(check-equal? 3 (*newRef 40))
-(check-equal? '(10 20 30 40) store )
-(check-equal? 10 (*deRef 0))
-(check-equal? 20 (*deRef 1))
-(check-equal? 30 (*deRef 2))
-(check-equal? 40 (*deRef 3))
-(check-equal? '(10 20 30 40) store)
- (*setRef 0 'a)
- (*setRef 1 'b)
- (*setRef 2 'c)
- (*setRef 3 'd)
-(check-equal? store '(a b c d))
-(set! store '())
