@@ -4,62 +4,84 @@
 (require eopl)
 (require "ast.rkt" )
 
-
+  
 ;; parse: list? --> Ast?
 ;; throws error if input is not in right format
 (define parse
   (lambda (ls)
     (cond
       [(null? ls) (error "Invalid input (null)")]
-   ;;constructs with more than one fields
-      [(list? ls)
+   ;;constructs with more than one fields  
+      [(list? ls) 
          (let ((head (first ls))(tail (rest ls)))
           (cond
                [(IsOp? head)  (letrec ((opInfo (lookupOp head))   ;find the operator metadata from the operator table
                                         (arity (second opInfo)))   ;get the arity
+                                   
 
-
-                                  (if (or (equal? arity 'n) (and (number? arity) (equal? arity (length tail))))
+                                  (if (or (equal? arity 'n) (and (number? arity) (equal? arity (length tail)))) 
                                       (primApp head (map parse tail))
                                       (error "Number of arguments do not match with arity of operator")))]
 
-
-                  [(equal? 'setRef head) (if (equal? (length tail) 2)
+              
+                  [(equal? 'setRef head) (if (equal? (length tail) 2) 
                                          (letrec ((var-exp (car tail)) (val-exp (cadr tail)))
                                              (setRef (parse var-exp) (parse val-exp)))
                                          (error "parse :" "bad syntax for setRef"))]
-
+                  
                    [(equal? 'seq head)   (letrec ((a (map parse tail)))
                                                   (seq a))]
+                                       
 
-
-                [(equal? 'assume head) (if (not (equal? 2 (length tail)))
+                [(equal? 'assume head) (if (not (equal? 2 (length tail))) 
                                            (error "parse :" "Bad syntax for assume")
                                            (letrec ( (concrete-binds (first tail))
-                                                     (ast-binds  (map
+                                                     (ast-binds  (map 
                                                                  (lambda(u)
                                                                         (mk-bind (first u)
-                                                                                 (parse (second u))))
+                                                                                 (parse (second u)))) 
                                                                   concrete-binds))
                                                       (concrete-body (second tail))
                                                       (ast-body (parse concrete-body)))
                                            (assume ast-binds ast-body)))]
 
-                 [(equal? 'assume* head) (if (not (equal? 2 (length tail)))
+                 [(equal? 'assume* head) (if (not (equal? 2 (length tail))) 
                                            (error "parse :" "Bad syntax for assume*")
                                            (letrec ( (concrete-binds (first tail))
-                                                     (ast-binds  (map
+                                                     (ast-binds  (map 
                                                                  (lambda(u)
                                                                         (mk-bind (first u)
-                                                                                 (parse (second u))))
+                                                                                 (parse (second u)))) 
                                                                   concrete-binds))
                                                       (concrete-body (second tail))
                                                       (ast-body (parse concrete-body)))
                                            (assume* ast-binds ast-body)))]
 
+                 [(equal? 'assume& head) (if (not (equal? 2 (length tail))) 
+                                           (error "parse :" "Bad syntax for assume&")
+                                           (letrec ( (concrete-binds (first tail))
+                                                     (ast-binds  (map 
+                                                                 (lambda(u)
+                                                                        (mk-bind (first u)
+                                                                                 (parse (second u)))) 
+                                                                  concrete-binds))
+                                                      (concrete-body (second tail))
+                                                      (ast-body (parse concrete-body)))
+                                           (assume& ast-binds ast-body)))]
 
-
-	         [(equal? 'function head) (if (not (equal? 2 (length tail)))
+                 [(equal? 'assume-v head) (if (not (equal? 2 (length tail))) 
+                                           (error "parse :" "Bad syntax for assume&")
+                                           (letrec ( (concrete-binds (first tail))
+                                                     (ast-binds  (map 
+                                                                 (lambda(u)
+                                                                        (mk-bind (first u)
+                                                                                 (parse (second u)))) 
+                                                                  concrete-binds))
+                                                      (concrete-body (second tail))
+                                                      (ast-body (parse concrete-body)))
+                                           (assume-v ast-binds ast-body)))]
+                 
+	         [(equal? 'function head) (if (not (equal? 2 (length tail))) 
                                               (error "parse :" "Bad syntax for function")
                                               (letrec ((formals (first tail))  (body (second tail)))
                                                    (function formals (parse body))))]
@@ -68,9 +90,9 @@
                  ;; applyf
                  [(id? head)        (applyf (parse head) (map parse tail))]
 
-                 [(equal? 'ifte head) (if (not (equal? 3 (length tail)))
-                                              (error "parse :" "Bad syntax for ifte")
-                                           (letrec ((test (parse (first tail)))
+                 [(equal? 'ifte head) (if (not (equal? 3 (length tail))) 
+                                              (error "parse :" "Bad syntax for ifte") 
+                                           (letrec ((test (parse (first tail))) 
                                                     (then (parse (second tail)))
                                                     (else (parse (third tail))))
                                       (ifte test then else)))]
@@ -82,5 +104,7 @@
                 [(boolean? ls)  (bool ls)]
                 [(id? ls)         (id ls)]
                 (else (error "bad input to parser"))))
-
+      
   )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
