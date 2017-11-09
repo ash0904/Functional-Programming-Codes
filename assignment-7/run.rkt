@@ -1,4 +1,6 @@
 #lang racket
+(require eopl/eopl)
 (provide (all-defined-out))
-(require eopl)
-(require "eval-ast.rkt" "env.rkt"  "parser.rkt" "ast.rkt")
+(require "eval-ast.rkt" "env.rkt" "ast.rkt" "parser.rkt")
+
+

@@ -1,7 +1,7 @@
 
 #lang racket
+(require eopl/eopl)
 (provide (all-defined-out))
-(require eopl)
 (require "ast.rkt" )
 
   
@@ -69,7 +69,7 @@
                                                       (ast-body (parse concrete-body)))
                                            (assume& ast-binds ast-body)))]
 
-                 [(equal? 'assume-v head) (if (not (equal? 2 (length tail))) 
+                 [(equal? 'assume& head) (if (not (equal? 2 (length tail))) 
                                            (error "parse :" "Bad syntax for assume&")
                                            (letrec ( (concrete-binds (first tail))
                                                      (ast-binds  (map 
@@ -79,7 +79,7 @@
                                                                   concrete-binds))
                                                       (concrete-body (second tail))
                                                       (ast-body (parse concrete-body)))
-                                           (assume-v ast-binds ast-body)))]
+                                           (assume& ast-binds ast-body)))]
                  
 	         [(equal? 'function head) (if (not (equal? 2 (length tail))) 
                                               (error "parse :" "Bad syntax for function")

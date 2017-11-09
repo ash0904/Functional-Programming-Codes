@@ -1,53 +1,12 @@
 
 #lang racket
+(require eopl/eopl)
 (provide (all-defined-out))
-(require eopl)
 
+;;Ast : num  | bool | primApp | id | assume | ifte | function | applyf | assume*
 
-;;;;;;;store
-(define store '())
-
-(define init-store (lambda()(set! store '())))
-
-;; newRef : storable? -> reference?
-;; returns a new reference with stored value v
-(define *newRef (lambda(v)(begin 
-                           (set! store (append store (list v))) 
-                           (- (length store) 1))))
-
-     
-
-;; deRef : denotable? -> storable?
-;; returns the stored value for a given reference
-
-(define *deRef (lambda(l) (let ((len (length store)))
-                           (if (or (zero? len) (> l len)) 
-                               (error "store- deRef: out of bound")
-                               (list-ref store l)))))
-
-;; setRef : denotable? storable? -> void
-;; changes the value stored at location referenced by l to v
-;; iterates through the store to point to correct index
-;; creates a new store with updated value at location l
-
-(define *setRef/k
-         (lambda (l v k)
-                 (letrec ((setRef-inner/k 
-                             (lambda (ls n k)
-                               (if (zero? n) 
-                                   (k (cons v (cdr ls)))
-                                   (if (null? ls)
-                                       (k (error (list "*setRef/k : out of bound" n)))
-                                       (setRef-inner/k 
-                                                   (cdr ls) 
-                                                   (- n 1)
-                                                   (lambda (v) (k (cons (car ls) v)))))))))
-                          (setRef-inner/k store l (lambda(w) (k (set! store w)))))))
-
-
-
-;;;;;;op
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; op.rkt
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; recursively computes the power of numbers given as a list of arguments
 (define pow (lambda (x n)
      (cond
@@ -100,10 +59,47 @@
  (lambda (s)
    (first (lookupOp s))))
 
+;;;;; store.rkt
+(define store '())
 
+(define init-store (lambda()(set! store '())))
 
-;;Ast : num  | bool | primApp | id | assume | ifte | function | applyf | assume*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; newRef : storable? -> reference?
+;; returns a new reference with stored value v
+(define *newRef (lambda(v)(begin 
+                           (set! store (append store (list v))) 
+                           (- (length store) 1))))
+
+     
+
+;; deRef : denotable? -> storable?
+;; returns the stored value for a given reference
+
+(define *deRef (lambda(l) (let ((len (length store)))
+                           (if (or (zero? len) (> l len)) 
+                               (error "store- deRef: out of bound")
+                               (list-ref store l)))))
+
+;; setRef : denotable? storable? -> void
+;; changes the value stored at location referenced by l to v
+;; iterates through the store to point to correct index
+;; creates a new store with updated value at location l
+
+(define *setRef/k
+         (lambda (l v k)
+                 (letrec ((setRef-inner/k 
+                             (lambda (ls n k)
+                               (if (zero? n) 
+                                   (k (cons v (cdr ls)))
+                                   (if (null? ls)
+                                       (k (error (list "*setRef/k : out of bound" n)))
+                                       (setRef-inner/k 
+                                                   (cdr ls) 
+                                                   (- n 1)
+                                                   (lambda (v) (k (cons (car ls) v)))))))))
+                          (setRef-inner/k store l (lambda(w) (k (set! store w)))))))
+
+;;;; ast.rkt
 (define-datatype Ast Ast?
   [num (n number?)]
   [bool (b boolean?)]

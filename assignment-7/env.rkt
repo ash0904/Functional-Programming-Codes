@@ -1,13 +1,12 @@
 
 #lang racket
+(require eopl/eopl)
 (provide (all-defined-out))
-(require eopl)
 (require "ast.rkt")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;defining closure/rec-closure/functionHandle 
-(define-datatype Argus Argus?
-  [expargu (body Ast?) (env Env?)])
+
 
 (define-datatype functionHandle functionHandle?
   [closure (formals (list-of symbol?)) (body Ast?) (env Env?)]
@@ -36,7 +35,6 @@
 (define storable? expressible?)
 (define denotable->expressible (lambda(thing) (*deRef thing)))
 (define expressible->denotable (lambda(thing) (*newRef thing)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; defining environment tuple
